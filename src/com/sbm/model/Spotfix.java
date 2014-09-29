@@ -5,8 +5,8 @@ import java.util.Date;
 
 public class Spotfix {
 
-    private static final String PENDING = "pending";
-    private static final String FIXED = "fixed";
+    public static final String PENDING = "pending";
+    public static final String FIXED = "fixed";
 
     private long id;
     private long ownerId;
@@ -19,17 +19,21 @@ public class Spotfix {
     private double longitude;
     private Date fixDate;
 
-    public Spotfix(long ownerId, String title, String description, long estimatedHours,
-                   long estimatedPeople, double latitude, double longitude, Date fixDate) {
-        this.ownerId = ownerId;
-        this.title = title;
-        this.description = description;
-        this.status = PENDING;
-        this.estimatedHours = estimatedHours;
-        this.estimatedPeople = estimatedPeople;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.fixDate = fixDate;
+    public Spotfix(SpotfixBuilder builder) {
+        id = builder.id;
+        ownerId = builder.ownerId;
+        title = builder.title;
+        description = builder.description;
+        status = builder.status;
+        estimatedHours = builder.estimatedHours;
+        estimatedPeople = builder.estimatedPeople;
+        latitude = builder.latitude;
+        longitude = builder.longitude;
+        fixDate = builder.fixDate;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public long getOwnerId() {

@@ -40,6 +40,7 @@ public class DataStorage extends SQLiteOpenHelper {
 
     private static final String INSERT_SPOTFIX = "INSERT INTO " +
             TABLE_SPOTFIX + " (" +
+            COLUMN_SPOTFIX_ID + "," +
             COLUMN_OWNER_ID + "," +
             COLUMN_TITLE + "," +
             COLUMN_DESCRIPTION + "," +
@@ -48,7 +49,7 @@ public class DataStorage extends SQLiteOpenHelper {
             COLUMN_ESTIMATED_PEOPLE + "," +
             COLUMN_LATITUDE + "," +
             COLUMN_LONGITUDE + "," +
-            COLUMN_FIX_DATE + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            COLUMN_FIX_DATE + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 
     public DataStorage(Context context) {
@@ -62,16 +63,19 @@ public class DataStorage extends SQLiteOpenHelper {
 
     public void createSpotfix(Spotfix spotfix) {
         SQLiteDatabase db = getWritableDatabase();
+        assert db != null;
         SQLiteStatement statement = db.compileStatement(INSERT_SPOTFIX);
-        statement.bindLong(1, spotfix.getOwnerId());
-        statement.bindString(2, spotfix.getTitle());
-        statement.bindString(3, spotfix.getDescription());
-        statement.bindString(4, spotfix.getStatus());
-        statement.bindLong(5, spotfix.getEstimatedHours());
-        statement.bindLong(6, spotfix.getEstimatedPeople());
-        statement.bindDouble(7, spotfix.getLatitude());
-        statement.bindDouble(8, spotfix.getLongitude());
-        statement.bindString(9, spotfix.getFixDateInString());
+        assert statement != null;
+        statement.bindLong(1, spotfix.getId());
+        statement.bindLong(2, spotfix.getOwnerId());
+        statement.bindString(3, spotfix.getTitle());
+        statement.bindString(4, spotfix.getDescription());
+        statement.bindString(5, spotfix.getStatus());
+        statement.bindLong(6, spotfix.getEstimatedHours());
+        statement.bindLong(7, spotfix.getEstimatedPeople());
+        statement.bindDouble(8, spotfix.getLatitude());
+        statement.bindDouble(9, spotfix.getLongitude());
+        statement.bindString(10, spotfix.getFixDateInString());
         statement.executeInsert();
         Log.d(TAG, "Spotfix created.");
     }
