@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import com.sbm.swachh_bharat.R;
+import com.sbm.R;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

@@ -1,7 +1,5 @@
 package com.sbm;
 
-import com.sbm.spotfixrequest.SpotfixRequestActivity;
-import com.sbm.swachh_bharat.R;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +7,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
+import com.sbm.spotfixrequest.SpotfixRequestActivity;
 
 public class MainActivity extends Activity {
 	private ActionBar actionBar;
