@@ -54,12 +54,12 @@ public class SpotfixBuilder {
         return this;
     }
 
-    public SpotfixBuilder setLatitude(long latitude) {
+    public SpotfixBuilder setLatitude(double latitude) {
         this.latitude = latitude;
         return this;
     }
 
-    public SpotfixBuilder setLongitude(long longitude) {
+    public SpotfixBuilder setLongitude(double longitude) {
         this.longitude = longitude;
         return this;
     }
