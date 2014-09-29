@@ -25,7 +25,7 @@ public class DataStorage extends SQLiteOpenHelper {
     private static final String COLUMN_LONGITUDE = "longitude";
     private static final String COLUMN_FIX_DATE = "fix_date";
 
-    private static final String CREATE_SPOTFIX_TABLE = "CREATE TABLE " +
+    private static final String CREATE_SPOTFIX_TABLE = "CREATE TABLE IF NOT EXISTS " +
             TABLE_SPOTFIX + " (" +
             COLUMN_SPOTFIX_ID + " INTEGER, " +
             COLUMN_OWNER_ID + " INTEGER, " +
