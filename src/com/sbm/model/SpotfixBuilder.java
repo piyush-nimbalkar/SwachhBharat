@@ -1,5 +1,7 @@
 package com.sbm.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class SpotfixBuilder {
@@ -44,6 +46,11 @@ public class SpotfixBuilder {
         return this;
     }
 
+    public SpotfixBuilder setStatus(String status) {
+        this.status = status;
+        return this;
+    }
+
     public SpotfixBuilder setEstimatedHours(long estimatedHours) {
         this.estimatedHours = estimatedHours;
         return this;
@@ -66,6 +73,12 @@ public class SpotfixBuilder {
 
     public SpotfixBuilder setFixDate(Date fixDate) {
         this.fixDate = fixDate;
+        return this;
+    }
+
+    public SpotfixBuilder setFixDate(String fixDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT);
+        this.fixDate = sdf.parse(fixDate);
         return this;
     }
 

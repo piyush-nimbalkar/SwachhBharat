@@ -1,17 +1,22 @@
 package com.sbm.storage;
 
+import android.database.Cursor;
 import android.util.Log;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import com.sbm.model.Spotfix;
+import com.sbm.model.SpotfixBuilder;
+
+import java.text.ParseException;
+import java.util.ArrayList;
 
 public class DataStorage extends SQLiteOpenHelper {
 
     private static final String TAG = "DATABASE";
-    private static final String DB_NAME = "swachh_bharat.db";
 
+    private static final String DB_NAME = "swachh_bharat.db";
     private static final String TABLE_SPOTFIX = "spotfix";
 
     private static final String COLUMN_SPOTFIX_ID = "spotfix_id";
@@ -78,6 +83,33 @@ public class DataStorage extends SQLiteOpenHelper {
         statement.bindString(10, spotfix.getFixDateInString());
         statement.executeInsert();
         Log.d(TAG, "Spotfix created.");
+    }
+
+    public ArrayList<Spotfix> getSpotfixes() throws ParseException {
+        SQLiteDatabase db = getReadableDatabase();
+        assert db != null;
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_SPOTFIX, null);
+        ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
+
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    Spotfix spotfix = SpotfixBuilder.spotfix()
+                            .setId(c.getLong(c.getColumnIndex(COLUMN_SPOTFIX_ID)))
+                            .setOwnerId(c.getLong(c.getColumnIndex(COLUMN_OWNER_ID)))
+                            .setTitle(c.getString(c.getColumnIndex(COLUMN_TITLE)))
+                            .setDescription(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)))
+                            .setStatus(c.getString(c.getColumnIndex(COLUMN_STATUS)))
+                            .setEstimatedHours(c.getLong(c.getColumnIndex(COLUMN_ESTIMATED_HOURS)))
+                            .setEstimatedPeople(c.getLong(c.getColumnIndex(COLUMN_ESTIMATED_PEOPLE)))
+                            .setLatitude(c.getDouble(c.getColumnIndex(COLUMN_LATITUDE)))
+                            .setLongitude(c.getDouble(c.getColumnIndex(COLUMN_LONGITUDE)))
+                            .setFixDate(c.getString(c.getColumnIndex(COLUMN_FIX_DATE))).build();
+                    spotfixes.add(spotfix);
+                } while (c.moveToNext());
+            }
+        }
+        return spotfixes;
     }
 
     @Override
