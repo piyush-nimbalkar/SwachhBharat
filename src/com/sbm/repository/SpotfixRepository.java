@@ -5,7 +5,6 @@ import com.sbm.model.Spotfix;
 import com.sbm.storage.DataStorage;
 
 public class SpotfixRepository {
-
     private final Context context;
     private static DataStorage dataStorage;
 
@@ -18,4 +17,7 @@ public class SpotfixRepository {
         dataStorage.createSpotfix(spotfix);
     }
 
+	public Context getContext() {
+		return context;
+	}
 }

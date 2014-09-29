@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.sbm.swachh_bharat.SpotfixRequestActivity" >
+
+    <Button
+        android:id="@+id/take_picture_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/take_picture_button_text" />
+
+    <FrameLayout
+        android:id="@+id/frame_for_image_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/take_picture_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/user_policy_toggle_button" >
+
+        <ImageView
+            android:id="@+id/picture_taken_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/image_content_description" />
+    </FrameLayout>
+
+    <ToggleButton
+        android:id="@+id/user_policy_toggle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+		android:textOn="@string/toggle_turn_on"
+        android:textOff="@string/toggle_turn_off"
+        android:checked="true" />
+
+    <TextView
+        android:id="@+id/policy_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/user_policy_toggle_button"
+        android:layout_alignBottom="@+id/user_policy_toggle_button"
+        android:layout_alignParentStart="true"
+        android:text="@string/user_policy_option_string"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/send_image_policy_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/take_picture_button"
+        android:layout_alignBottom="@+id/take_picture_button"
+        android:layout_alignEnd="@+id/frame_for_image_display"
+        android:layout_marginStart="40dp"
+        android:layout_toEndOf="@+id/take_picture_button"
+        android:text="@string/send_image_policy_button_text" />
+
+</RelativeLayout>

@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SwachhBharat</string>
+
+    <string name="app_name">Swachh Bharat</string>
+
+    <string name="action_add_request">Add Request</string>
+    <string name="album_name">Swachh Bharat</string>
+    <string name="take_picture_button_text">Take Picture</string>
+    <string name="title_activity_spotfix_request">SpotfixRequestActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="send">Send</string>
+
+    <string name="scanning">scanning for devices</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
+    <string name="image_content_description">This image was taken by the user</string>
+    <string name="user_policy_option_string">Allow taking pictures</string>
+    <string name="toggle_turn_on">Yes</string>
+	<string name="toggle_turn_off">No</string>
+	<string name="send_image_policy_button_text">Send Info</string>
+	<string name="send_image_policy_button">Send Info</string>
 </resources>
