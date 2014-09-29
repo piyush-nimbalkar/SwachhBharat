@@ -8,6 +8,8 @@ public class Spotfix {
     public static final String PENDING = "pending";
     public static final String FIXED = "fixed";
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     private long id;
     private long ownerId;
     private String title;
@@ -69,7 +71,7 @@ public class Spotfix {
     }
 
     public String getFixDateInString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         return sdf.format(fixDate);
     }
 

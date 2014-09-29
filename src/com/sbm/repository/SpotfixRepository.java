@@ -1,10 +1,16 @@
 package com.sbm.repository;
 
 import android.content.Context;
+import android.util.Log;
 import com.sbm.model.Spotfix;
 import com.sbm.storage.DataStorage;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+
 public class SpotfixRepository {
+
+    private static final String TAG = "SPOTFIX_REPOSITORY";
 
     private final Context context;
     private static DataStorage dataStorage;
@@ -16,6 +22,17 @@ public class SpotfixRepository {
 
     public void createSpotfix(Spotfix spotfix) {
         dataStorage.createSpotfix(spotfix);
+    }
+
+    public ArrayList<Spotfix> getSpotfixes() {
+        ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
+        try {
+            spotfixes = dataStorage.getSpotfixes();
+        } catch (ParseException e) {
+            Log.d(TAG, "A parse error occured while loading records from the database.");
+            e.printStackTrace();
+        }
+        return spotfixes;
     }
 
 }
