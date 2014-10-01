@@ -27,4 +27,14 @@
 	<string name="toggle_turn_off">No</string>
 	<string name="send_image_policy_button_text">Send Info</string>
 	<string name="send_image_policy_button">Send Info</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="notification_message">is nearby. Do you wanna partner?</string>
+    <string name="logout">logout</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="create_account_link">Create an account</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="passwordconfirmation">Confim Password</string>
 </resources>
