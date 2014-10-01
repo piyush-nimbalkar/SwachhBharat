@@ -57,7 +57,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                 username = editTextUsername.getText().toString();
                 password = editTextPassword.getText().toString();
                 passwordconfirmation = editTextPasswordConfirmation.getText().toString();
-                Toast.makeText(this, "Submitted", Toast.LENGTH_SHORT);
+                Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT);
                 break;
         }
     }
