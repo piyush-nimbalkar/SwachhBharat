@@ -13,5 +13,35 @@
     <string name="spotfix_fix_date_text">Fixing Date</string>
     <string name="spotfix_fix_date_selected_text">Select by clicking button below</string>
     <string name="spotfix_fix_date_button_text">Select Date</string>
-    
+
+    <string name="send">Send</string>
+
+    <string name="scanning">scanning for devices</string>
+    <string name="select_device">select a device to connect</string>
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
+    <string name="title_paired_devices">Paired Devices</string>
+    <string name="title_other_devices">Other Available Devices</string>
+    <string name="button_scan">Scan for devices</string>
+
+    <string name="secure_connect">Connect a device - Secure</string>
+    <string name="insecure_connect">Connect a device - Insecure</string>
+    <string name="discoverable">Make discoverable</string>
+    <string name="image_content_description">This image was taken by the user</string>
+    <string name="user_policy_option_string">Allow taking pictures</string>
+    <string name="toggle_turn_on">Yes</string>
+	<string name="toggle_turn_off">No</string>
+	<string name="send_image_policy_button_text">Send Info</string>
+	<string name="send_image_policy_button">Send Info</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="notification_message">is nearby. Do you wanna partner?</string>
+    <string name="logout">logout</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="create_account_link">Create an account</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="passwordconfirmation">Confim Password</string>
+
 </resources>
