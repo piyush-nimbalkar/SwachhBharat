@@ -8,59 +8,112 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.sbm.swachh_bharat.SpotfixRequestActivity" >
 
-    <Button
-        android:id="@+id/take_picture_button"
+    <EditText
+        android:id="@+id/editTextSpotfixTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:text="@string/take_picture_button_text" />
-
-    <FrameLayout
-        android:id="@+id/frame_for_image_display"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/take_picture_button"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/user_policy_toggle_button" >
-
-        <ImageView
-            android:id="@+id/picture_taken_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/image_content_description" />
-    </FrameLayout>
-
-    <ToggleButton
-        android:id="@+id/user_policy_toggle_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-		android:textOn="@string/toggle_turn_on"
-        android:textOff="@string/toggle_turn_off"
-        android:checked="true" />
+        android:layout_toEndOf="@+id/textViewSpotfixTitle"
+        android:ems="10"
+        android:inputType="textCapSentences" />
 
     <TextView
-        android:id="@+id/policy_text_view"
+        android:id="@+id/textViewSpotfixTitle"
+        android:labelFor="@+id/editTextSpotfixTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/user_policy_toggle_button"
-        android:layout_alignBottom="@+id/user_policy_toggle_button"
+        android:layout_alignBaseline="@+id/editTextSpotfixTitle"
+        android:layout_alignBottom="@+id/editTextSpotfixTitle"
         android:layout_alignParentStart="true"
-        android:text="@string/user_policy_option_string"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="@string/spotfix_title_text" />
+
+    <TextView
+        android:id="@+id/textViewSpotfixDesc"
+        android:labelFor="@+id/editTextSpotfixDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editTextSpotfixDesc"
+        android:layout_alignBottom="@+id/editTextSpotfixDesc"
+        android:text="@string/spotfix_description_text" />
+
+    <EditText
+        android:id="@+id/editTextSpotfixDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/editTextSpotfixTitle"
+        android:layout_toEndOf="@+id/textViewSpotfixDesc"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+    <TextView
+        android:id="@+id/textViewSpotfixEstimatedHours"
+        android:labelFor="@+id/editTextSpotfixEstimatedHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editTextSpotfixEstimatedHours"
+        android:layout_alignBottom="@+id/editTextSpotfixEstimatedHours"
+        android:text="@string/spotfix_estimated_hours_text" />
+
+    <EditText
+        android:id="@+id/editTextSpotfixEstimatedHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/editTextSpotfixDesc"
+        android:layout_toEndOf="@+id/textViewSpotfixEstimatedHours"
+        android:ems="10"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/textViewSpotfixEstimatedPeople"
+        android:labelFor="@+id/editTextSpotfixEstimatedPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/editTextSpotfixEstimatedPeople"
+        android:layout_alignBottom="@+id/editTextSpotfixEstimatedPeople"
+        android:text="@string/spotfix_estimated_people_text" />
+
+    <EditText
+        android:id="@+id/editTextSpotfixEstimatedPeople"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/editTextSpotfixEstimatedHours"
+        android:layout_toEndOf="@+id/textViewSpotfixEstimatedPeople"
+        android:ems="10"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/textViewSpotfixFixingDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/textViewSpotfixEstimatedPeople"
+        android:layout_alignParentStart="true"
+        android:text="@string/spotfix_fix_date_text" />
+
+    <TextView
+        android:id="@+id/textViewSpotfixFixingDateSelected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:layout_below="@+id/editTextSpotfixEstimatedPeople"
+        android:layout_alignParentEnd="true"
+        android:text="@string/spotfix_fix_date_selected_text" />
 
     <Button
-        android:id="@+id/send_image_policy_button"
+        android:id="@+id/buttonSpotfixFixingDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/take_picture_button"
-        android:layout_alignBottom="@+id/take_picture_button"
-        android:layout_alignEnd="@+id/frame_for_image_display"
-        android:layout_marginStart="40dp"
-        android:layout_toEndOf="@+id/take_picture_button"
-        android:text="@string/send_image_policy_button_text" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textViewSpotfixFixingDate"
+        android:layout_marginTop="11dp"
+        android:onClick="showDatePickerDialog"
+        android:text="@string/spotfix_fix_date_button_text"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Small" />
 
 </RelativeLayout>
