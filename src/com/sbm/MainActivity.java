@@ -42,14 +42,21 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle presses on the action bar items
-	    switch (item.getItemId()) {
-	        case R.id.action_add_request:
-	        	Intent addRequestIntent = new Intent(this, SpotfixRequestActivity.class);
-	        	addRequestIntent.putExtra("key", "value"); //Optional parameters
-	        	startActivity(addRequestIntent);
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+//	    switch (item.getItemId()) {
+//	        case R.id.action_add_request:
+//	        	Intent addRequestIntent = new Intent(this, SpotfixRequestActivity.class);
+//	        	addRequestIntent.putExtra("key", "value"); //Optional parameters
+//	        	startActivity(addRequestIntent);
+//	            return true;
+//	        default:
+//	            return super.onOptionsItemSelected(item);
+//	    }
+		if (item.getItemId() == R.id.action_add_request) {
+        	Intent addRequestIntent = new Intent(this, SpotfixRequestActivity.class);
+        	addRequestIntent.putExtra("key", "value"); //Optional parameters
+        	startActivity(addRequestIntent);
+            return true;
+		}
+        return super.onOptionsItemSelected(item);
 	}
 }

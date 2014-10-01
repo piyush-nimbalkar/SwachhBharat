@@ -1,13 +1,9 @@
 package com.sbm;
 
 import android.app.Activity;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.*;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -50,16 +46,24 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.buttonSubmit:
-                firstname = editTextFirstName.getText().toString();
-                lastname = editTextLastName.getText().toString();
-                username = editTextUsername.getText().toString();
-                password = editTextPassword.getText().toString();
-                passwordconfirmation = editTextPasswordConfirmation.getText().toString();
-                Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT);
-                break;
-        }
+//        switch (v.getId()) {
+//            case R.id.buttonSubmit:
+//                firstname = editTextFirstName.getText().toString();
+//                lastname = editTextLastName.getText().toString();
+//                username = editTextUsername.getText().toString();
+//                password = editTextPassword.getText().toString();
+//                passwordconfirmation = editTextPasswordConfirmation.getText().toString();
+//                Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT);
+//                break;
+//        }
+    	if (v.getId() == R.id.buttonSubmit) {
+            firstname = editTextFirstName.getText().toString();
+            lastname = editTextLastName.getText().toString();
+            username = editTextUsername.getText().toString();
+            password = editTextPassword.getText().toString();
+            passwordconfirmation = editTextPasswordConfirmation.getText().toString();
+            Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT).show();
+    	}
     }
 
     @Override
