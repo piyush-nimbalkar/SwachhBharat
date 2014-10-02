@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -26,6 +27,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import static com.sbm.Global.*;
 
@@ -36,11 +38,13 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     private String[] params = new String[2];
 
     Context context;
+    SharedPreferences preferences;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         context = this;
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         editTextUsername = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
@@ -69,9 +73,16 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     }
 
     @Override
-    public void receive(ServerResponse response) {
+    public void receive(ServerResponse response) throws JSONException {
         if (response != null) {
             if (response.getStatusCode() == HTTP_SUCCESS) {
+                JSONObject userObject = new JSONObject(response.getMessage()).getJSONObject(USER_OBJECT);
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putLong(CURRENT_USER_ID, userObject.getLong(USER_ID));
+                editor.putString(CURRENT_USER_EMAIL, userObject.getString(EMAIL));
+                editor.commit();
+
                 startActivity(new Intent(context, MainActivity.class));
                 finish();
             } else {

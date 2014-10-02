@@ -1,19 +1,35 @@
 package com.sbm;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.sbm.spotfixrequest.SpotfixRequestActivity;
 
+import static com.sbm.Global.*;
+
 public class MainActivity extends Activity {
+
+    private static String TAG = "MAIN_ACTIVITY";
+
+    private Context context;
+    private SharedPreferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        context = this;
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.d(TAG, Long.valueOf(preferences.getLong(CURRENT_USER_ID, 0)).toString());
+        Log.d(TAG, preferences.getString(CURRENT_USER_EMAIL, ""));
     }
 
     @Override
