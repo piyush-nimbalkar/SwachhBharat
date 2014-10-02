@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -32,6 +34,8 @@ import static com.sbm.Global.*;
 public class RegisterActivity extends Activity implements View.OnClickListener, DataReceiver {
 
     private Context context;
+    private SharedPreferences preferences;
+
     private EditText editTextFirstName;
     private EditText editTextLastName;
     private EditText editTextEmail;
@@ -45,6 +49,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         setContentView(R.layout.activity_register);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         context = this;
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         editTextFirstName = (EditText) findViewById(R.id.editTextFirstName);
         editTextLastName = (EditText) findViewById(R.id.editTextLastName);
@@ -76,6 +81,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     public void receive(ServerResponse response) throws JSONException {
         if (response != null) {
             if (response.getStatusCode() == HTTP_CREATED) {
+                JSONObject userObject = new JSONObject(response.getMessage()).getJSONObject(USER_OBJECT);
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putLong(CURRENT_USER_ID, userObject.getLong(USER_ID));
+                editor.putString(CURRENT_USER_EMAIL, userObject.getString(EMAIL));
+                editor.commit();
+
                 startActivity(new Intent(context, MainActivity.class));
                 finish();
             } else {
