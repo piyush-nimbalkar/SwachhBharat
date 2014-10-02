@@ -140,7 +140,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/imageViewDisplayTakenPicture"
         android:layout_toStartOf="@+id/buttonSpotfixTakePicture"
         android:text="@string/submit_request_button_text" />
 

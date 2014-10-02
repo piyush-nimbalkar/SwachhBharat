@@ -64,6 +64,9 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 		mSpotfixTakePictureButton = (Button) findViewById(R.id.buttonSpotfixTakePicture);
 		mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
 		
+		mImageView = (ImageView) findViewById(R.id.imageViewDisplayTakenPicture);
+		mImageView.setVisibility(View.GONE);
+		
 		addOnClickListener();
     }
 
