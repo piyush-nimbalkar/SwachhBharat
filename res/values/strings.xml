@@ -43,5 +43,8 @@
     <string name="firstname">First Name</string>
     <string name="lastname">Last Name</string>
     <string name="passwordconfirmation">Confim Password</string>
+    <string name="login_button_text">Login</string>
+    <string name="password_label_text">Password</string>
+    <string name="email_label_text">Email</string>
 
 </resources>
