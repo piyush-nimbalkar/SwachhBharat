@@ -58,6 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dip"
                 android:layout_marginBottom="5dip"
+                android:inputType="textEmailAddress"
                 android:singleLine="true" />
 
             <!--  Password Label -->
@@ -88,7 +89,7 @@
                 android:layout_marginBottom="40dip"
                 android:text="@string/create_account_link"
                 android:gravity="center"
-                android:textSize="15dip"
+                android:textSize="15sp"
                 android:textColor="#0b84aa" />
 
         </LinearLayout>
