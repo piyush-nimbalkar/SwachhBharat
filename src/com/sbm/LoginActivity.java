@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.content.SharedPreferences;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONException;
 
 import static com.sbm.Global.*;
 
@@ -32,6 +34,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     private EditText editTextUsername;
     private EditText editTextPassword;
     private String[] params = new String[2];
+
     Context context;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -125,7 +128,11 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         @Override
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
-            delegate.receive(response);
+            try {
+                delegate.receive(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (dialog.isShowing())
                 dialog.dismiss();
         }

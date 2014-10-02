@@ -18,6 +18,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -70,13 +73,18 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     }
 
     @Override
-    public void receive(ServerResponse response) {
+    public void receive(ServerResponse response) throws JSONException {
         if (response != null) {
             if (response.getStatusCode() == HTTP_CREATED) {
                 startActivity(new Intent(context, MainActivity.class));
                 finish();
             } else {
-                Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
+                JSONObject errorJSON = new JSONObject(response.getMessage());
+                JSONArray messagesArray = errorJSON.getJSONArray(ERROR_MESSAGES);
+                String errorMessages = "";
+                for (int i = 0; i < messagesArray.length(); i++)
+                    errorMessages += messagesArray.getString(i) + "\n";
+                Toast.makeText(context, errorMessages, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -131,7 +139,11 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         @Override
         protected void onPostExecute(ServerResponse response) {
             super.onPostExecute(response);
-            delegate.receive(response);
+            try {
+                delegate.receive(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (dialog.isShowing())
                 dialog.dismiss();
         }

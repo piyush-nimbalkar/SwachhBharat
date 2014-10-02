@@ -11,6 +11,8 @@ public final class Global {
     static final String PASSWORD = "password";
     static final String PASSWORD_CONFIRMATION = "password_confirmation";
 
+    static final String ERROR_MESSAGES = "errors";
+
     static final int HTTP_SUCCESS = 200;
     static final int HTTP_CREATED = 201;
 
