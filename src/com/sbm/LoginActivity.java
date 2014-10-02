@@ -1,8 +1,5 @@
 package com.sbm;
 
-import static com.sbm.Global.LOGIN_URL;
-import static com.sbm.Global.USERNAME;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
@@ -28,6 +25,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.sbm.Global.*;
+
 public class LoginActivity extends Activity implements View.OnClickListener, DataReceiver {
 
     private EditText editTextUsername;
@@ -40,7 +39,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         setContentView(R.layout.activity_login);
         context = this;
 
-        editTextUsername = (EditText) findViewById(R.id.editTextUsername);
+        editTextUsername = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         Button buttonSignIn = (Button) findViewById(R.id.buttonLogin);
         TextView createAccountLink = (TextView) findViewById(R.id.createAccountLink);
@@ -69,10 +68,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
     @Override
     public void receive(ServerResponse response) {
         if (response != null) {
-            if (response.getStatusCode() == 200) {
-                Intent i = new Intent(context, MainActivity.class);
-                i.putExtra(USERNAME, params[0]);
-                startActivity(i);
+            if (response.getStatusCode() == HTTP_SUCCESS) {
+                startActivity(new Intent(context, MainActivity.class));
                 finish();
             } else {
                 Toast.makeText(context, response.getMessage(), Toast.LENGTH_LONG).show();
@@ -82,8 +79,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
 
     private static class LoginSession extends AsyncTask<String, Integer, ServerResponse> {
         private final Context LoginSessionContext;
-        public DataReceiver delegate;
         private ProgressDialog dialog;
+        public DataReceiver delegate;
 
         public LoginSession(Context context) {
             LoginSessionContext = context;
@@ -91,19 +88,22 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setMessage("Signing in..");
+            this.dialog.show();
+        }
+
+        @Override
         protected ServerResponse doInBackground(String... params) {
             ServerResponse serverResponse = null;
-            String[] parameters = params;
-
-            String username = parameters[0];
-            String password = parameters[1];
 
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost(LOGIN_URL);
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair("email", username));
-            value.add(new BasicNameValuePair("password", password));
+            value.add(new BasicNameValuePair(EMAIL, params[0]));
+            value.add(new BasicNameValuePair(PASSWORD, params[1]));
 
             try {
                 post.setEntity(new UrlEncodedFormEntity(value));
@@ -128,13 +128,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Dat
             delegate.receive(response);
             if (dialog.isShowing())
                 dialog.dismiss();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            this.dialog.setMessage("Signing in..");
-            this.dialog.show();
         }
 
         @Override

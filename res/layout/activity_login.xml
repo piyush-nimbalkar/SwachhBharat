@@ -51,9 +51,9 @@
             <TextView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#372c24"
-                android:text="@string/email_label_text" />
+                android:text="@string/email_label" />
 
-            <EditText android:id="@+id/editTextUsername"
+            <EditText android:id="@+id/editTextEmail"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dip"
@@ -65,7 +65,7 @@
             <TextView android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#372c24"
-                android:text="@string/password_label_text" />
+                android:text="@string/password_label" />
 
             <EditText android:id="@+id/editTextPassword"
                 android:layout_width="fill_parent"
@@ -79,7 +79,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
-                android:text="@string/login_button_text" />
+                android:text="@string/login_button" />
 
             <!-- Link to Registration Screen -->
             <TextView android:id="@+id/createAccountLink"
