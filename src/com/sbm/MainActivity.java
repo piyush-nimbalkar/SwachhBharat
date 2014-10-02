@@ -13,9 +13,6 @@ import com.sbm.spotfixrequest.SpotfixRequestActivity;
 public class MainActivity extends Activity {
 	private ActionBar actionBar;
 
-	/**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
