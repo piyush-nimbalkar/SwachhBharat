@@ -34,17 +34,13 @@
 	<string name="send_image_policy_button_text">Send Info</string>
 	<string name="send_image_policy_button">Send Info</string>
 
-    <string name="create_account">Create Account</string>
-    <string name="notification_message">is nearby. Do you wanna partner?</string>
-    <string name="logout">logout</string>
-    <string name="username">Username</string>
-    <string name="password">Password</string>
     <string name="create_account_link">Create an account</string>
-    <string name="firstname">First Name</string>
-    <string name="lastname">Last Name</string>
-    <string name="passwordconfirmation">Confim Password</string>
-    <string name="login_button_text">Login</string>
-    <string name="password_label_text">Password</string>
-    <string name="email_label_text">Email</string>
+    <string name="login_button">Login</string>
+    <string name="password_label">Password</string>
+    <string name="email_label">Email</string>
+    <string name="first_name_label">First Name</string>
+    <string name="last_name_label">Last Name</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="create_account_button">Create Account</string>
 
 </resources>
