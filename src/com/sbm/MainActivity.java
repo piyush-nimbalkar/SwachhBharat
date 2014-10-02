@@ -49,6 +49,14 @@ public class MainActivity extends Activity {
             case R.id.action_add_request:
                 startActivity(new Intent(context, SpotfixRequestActivity.class));
                 return true;
+            case R.id.action_logout:
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putLong(CURRENT_USER_ID, 0);
+                editor.putString(CURRENT_USER_EMAIL, "");
+                editor.commit();
+                startActivity(new Intent(context, LoginActivity.class));
+                finish();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

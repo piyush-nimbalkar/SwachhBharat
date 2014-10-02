@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Swachh Bharat</string>
     <string name="action_add_request">Add Request</string>
+    <string name="action_logout">Logout</string>
     <string name="album_name">Swachh Bharat</string>
     <string name="take_picture_button_text">Take Picture</string>
     <string name="title_activity_spotfix_request">Add Spotfix Request</string>
