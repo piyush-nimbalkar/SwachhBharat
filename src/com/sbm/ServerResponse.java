@@ -1,12 +1,13 @@
 package com.sbm;
 
 public class ServerResponse {
+
     private int statusCode;
     private String message;
 
-    public ServerResponse(int statusCode_, String message_) {
-        statusCode = statusCode_;
-        message = message_;
+    public ServerResponse(int statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
     }
 
     public int getStatusCode() {
@@ -16,4 +17,5 @@ public class ServerResponse {
     public String getMessage() {
         return message;
     }
+
 }

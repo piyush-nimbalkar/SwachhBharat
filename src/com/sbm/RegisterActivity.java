@@ -34,7 +34,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
     private EditText editTextEmail;
     private EditText editTextPassword;
     private EditText editTextPasswordConfirmation;
-    private Button buttonSubmit;
 
     private String[] params = new String[5];
 
@@ -49,7 +48,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener, 
         editTextEmail = (EditText) findViewById(R.id.editTextRegisterEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         editTextPasswordConfirmation = (EditText) findViewById(R.id.editTextConfirmPassword);
-        buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
+        Button buttonSubmit = (Button) findViewById(R.id.buttonSubmit);
 
         buttonSubmit.setOnClickListener(this);
     }

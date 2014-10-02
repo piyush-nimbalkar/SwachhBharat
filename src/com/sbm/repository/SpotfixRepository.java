@@ -28,7 +28,7 @@ public class SpotfixRepository {
         try {
             spotfixes = dataStorage.getSpotfixes();
         } catch (ParseException e) {
-            Log.d(TAG, "A parse error occured while loading records from the database.");
+            Log.d(TAG, "A parse error occurred while loading records from the database.");
             e.printStackTrace();
         }
         return spotfixes;
