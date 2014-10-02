@@ -111,9 +111,37 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textViewSpotfixFixingDate"
         android:layout_marginTop="11dp"
-        android:onClick="showDatePickerDialog"
         android:text="@string/spotfix_fix_date_button_text"
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.Small" />
+
+    <ImageView
+        android:id="@+id/imageViewDisplayTakenPicture"
+        android:contentDescription="@string/image_view_picture_taken_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonSpotfixTakePicture"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/buttonSpotfixFixingDate"
+        android:src="@drawable/ic_launcher" />
+
+    <Button
+        android:id="@+id/buttonSpotfixTakePicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:text="@string/take_picture_button_text" />
+
+    <Button
+        android:id="@+id/buttonSpotfixSubmitRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/imageViewDisplayTakenPicture"
+        android:layout_toStartOf="@+id/buttonSpotfixTakePicture"
+        android:text="@string/submit_request_button_text" />
 
 </RelativeLayout>

@@ -3,8 +3,10 @@
     <string name="app_name">Swachh Bharat</string>
     <string name="action_add_request">Add Request</string>
     <string name="action_logout">Logout</string>
-    <string name="album_name">Swachh Bharat</string>
+    <string name="album_name">Swachh_Bharat</string>
     <string name="take_picture_button_text">Take Picture</string>
+    <string name="submit_request_button_text">Submit Request</string>
+    <string name="image_view_picture_taken_desc">Picture taken</string>
     <string name="title_activity_spotfix_request">Add Spotfix Request</string>
     <string name="action_settings">Settings</string>
     <string name="spotfix_title_text">Title</string>
@@ -14,7 +16,8 @@
     <string name="spotfix_fix_date_text">Fixing Date</string>
     <string name="spotfix_fix_date_selected_text">Select by clicking button below</string>
     <string name="spotfix_fix_date_button_text">Select Date</string>
-
+    <string name="spotfix_take_picture_button_text">Take Picture</string>
+    
     <string name="send">Send</string>
 
     <string name="scanning">scanning for devices</string>
