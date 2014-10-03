@@ -4,6 +4,7 @@ public final class Global {
 
     static final String REGISTER_URL = "http://swachh-bharat.herokuapp.com/users";
     static final String LOGIN_URL = "http://swachh-bharat.herokuapp.com/login";
+    static final String GET_SPOTFIXES_URL = "http://swachh-bharat.herokuapp.com/spotfixes";
 
     static final String CURRENT_USER_ID = "current_user_id";
     static final String CURRENT_USER_EMAIL = "current_user_email";
