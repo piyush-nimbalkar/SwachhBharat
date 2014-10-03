@@ -17,7 +17,7 @@
     <string name="spotfix_fix_date_selected_text">Select by clicking button below</string>
     <string name="spotfix_fix_date_button_text">Select Date</string>
     <string name="spotfix_take_picture_button_text">Take Picture</string>
-    
+
     <string name="send">Send</string>
 
     <string name="scanning">scanning for devices</string>
@@ -46,5 +46,10 @@
     <string name="last_name_label">Last Name</string>
     <string name="confirm_password_label">Confirm Password</string>
     <string name="create_account_button">Create Account</string>
+
+    <string name="settings_button">Settings</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="gps_dialog_message">GPS is not enabled. Do you want to enable?</string>
+    <string name="gps_dialog_title">GPS Settings</string>
 
 </resources>
