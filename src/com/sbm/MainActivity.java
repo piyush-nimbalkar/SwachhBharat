@@ -10,16 +10,31 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.sbm.model.Spotfix;
+import com.sbm.repository.SpotfixRepository;
 import com.sbm.spotfixrequest.SpotfixRequestActivity;
+
+import java.util.ArrayList;
 
 import static com.sbm.Global.*;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements DataReceiver {
 
     private static String TAG = "MAIN_ACTIVITY";
 
     private Context context;
     private SharedPreferences preferences;
+
+    private GoogleMap map;
+    private LocationTracker locationTracker;
+
+    private ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +47,20 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        locationTracker = new LocationTracker(context);
+
+        MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.spotfixes_map));
+        assert mapFragment != null;
+        map = mapFragment.getMap();
+        map.getUiSettings().setZoomControlsEnabled(false);
+
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(39.255, -76.710), 15));
+
+        SyncSpotfixesTask task = new SyncSpotfixesTask(context);
+        task.delegate = (DataReceiver) context;
+        task.execute();
 
         Log.d(TAG, Long.valueOf(preferences.getLong(CURRENT_USER_ID, 0)).toString());
         Log.d(TAG, preferences.getString(CURRENT_USER_EMAIL, ""));
@@ -60,6 +89,24 @@ public class MainActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (locationTracker != null)
+            locationTracker.removeLocationUpdates();
+    }
+
+    @Override
+    public void receive(ServerResponse serverResponse) {
+        SpotfixRepository repository = new SpotfixRepository(context);
+        spotfixes = repository.getSpotfixes();
+        map.clear();
+        for (Spotfix spotfix : spotfixes)
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
+                    .title(String.valueOf(spotfix.getTitle())));
     }
 
 }

@@ -3,7 +3,7 @@ package com.sbm;
 public final class Global {
     public static final String REGISTER_URL = "http://swachh-bharat.herokuapp.com/users";
     public static final String LOGIN_URL = "http://swachh-bharat.herokuapp.com/login";
-    public static final String SPOTFIX_SUBMIT_URL = "http://swachh-bharat.herokuapp.com/spotfixes";
+    public static final String CREATE_SPOTFIXES_URL = "http://swachh-bharat.herokuapp.com/spotfixes";
 
     public static final String CURRENT_USER_ID = "current_user_id";
     public static final String CURRENT_USER_EMAIL = "current_user_email";

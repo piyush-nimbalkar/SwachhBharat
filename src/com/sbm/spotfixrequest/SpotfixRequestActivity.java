@@ -211,7 +211,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             ServerResponse serverResponse = null;
 
             HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(Global.SPOTFIX_SUBMIT_URL);
+            HttpPost post = new HttpPost(Global.CREATE_SPOTFIXES_URL);
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
             value.add(new BasicNameValuePair(Global.USER_ID, params[0]));

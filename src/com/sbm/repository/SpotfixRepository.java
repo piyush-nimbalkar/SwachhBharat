@@ -23,6 +23,16 @@ public class SpotfixRepository {
         dataStorage.createSpotfix(spotfix);
     }
 
+    public void createSpotfixes(ArrayList<Spotfix> spotfixes) {
+        deleteSpotfixes();
+        for (Spotfix spotfix : spotfixes)
+            createSpotfix(spotfix);
+    }
+
+    private void deleteSpotfixes() {
+        dataStorage.deleteSpotfixes();
+    }
+
     public ArrayList<Spotfix> getSpotfixes() {
         ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
         try {
@@ -34,7 +44,4 @@ public class SpotfixRepository {
         return spotfixes;
     }
 
-	public Context getContext() {
-		return context;
-	}
 }
