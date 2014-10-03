@@ -67,6 +67,8 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 		mImageView = (ImageView) findViewById(R.id.imageViewDisplayTakenPicture);
 		mImageView.setVisibility(View.GONE);
 		
+		mAlbumStorageDirFactory = new BaseAlbumDirFactory();
+
 		addOnClickListener();
     }
 
