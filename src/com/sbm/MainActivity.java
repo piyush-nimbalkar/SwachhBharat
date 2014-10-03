@@ -13,9 +13,14 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.sbm.model.Spotfix;
+import com.sbm.repository.SpotfixRepository;
 import com.sbm.spotfixrequest.SpotfixRequestActivity;
-import org.json.JSONException;
+
+import java.util.ArrayList;
 
 import static com.sbm.Global.*;
 
@@ -28,6 +33,8 @@ public class MainActivity extends Activity implements DataReceiver {
 
     private GoogleMap map;
     private LocationTracker locationTracker;
+
+    private ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,7 @@ public class MainActivity extends Activity implements DataReceiver {
                 new LatLng(39.255, -76.710), 15));
 
         SyncSpotfixesTask task = new SyncSpotfixesTask(context);
+        task.delegate = (DataReceiver) context;
         task.execute();
 
         Log.d(TAG, Long.valueOf(preferences.getLong(CURRENT_USER_ID, 0)).toString());
@@ -91,7 +99,14 @@ public class MainActivity extends Activity implements DataReceiver {
     }
 
     @Override
-    public void receive(ServerResponse serverResponse) throws JSONException {
-        Log.d(TAG, "Response received!");
+    public void receive(ServerResponse serverResponse) {
+        SpotfixRepository repository = new SpotfixRepository(context);
+        spotfixes = repository.getSpotfixes();
+        map.clear();
+        for (Spotfix spotfix : spotfixes)
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
+                    .title(String.valueOf(spotfix.getTitle())));
     }
+
 }

@@ -30,6 +30,8 @@ public class SyncSpotfixesTask extends AsyncTask<String, Integer, ServerResponse
     private final Context context;
     private ProgressDialog dialog;
 
+    public DataReceiver delegate;
+
     public SyncSpotfixesTask(Context context) {
         this.context = context;
         dialog = new ProgressDialog(this.context);
@@ -94,6 +96,12 @@ public class SyncSpotfixesTask extends AsyncTask<String, Integer, ServerResponse
 
         SpotfixRepository repository = new SpotfixRepository(context);
         repository.createSpotfixes(spotfixes);
+
+        try {
+            delegate.receive(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         if (dialog.isShowing())
             dialog.dismiss();
