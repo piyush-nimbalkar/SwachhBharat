@@ -52,7 +52,6 @@ public class MainActivity extends Activity implements DataReceiver {
                 new LatLng(39.255, -76.710), 15));
 
         SyncSpotfixesTask task = new SyncSpotfixesTask(context);
-        task.delegate = (DataReceiver) context;
         task.execute();
 
         Log.d(TAG, Long.valueOf(preferences.getLong(CURRENT_USER_ID, 0)).toString());

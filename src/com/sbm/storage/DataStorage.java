@@ -112,6 +112,12 @@ public class DataStorage extends SQLiteOpenHelper {
         return spotfixes;
     }
 
+    public void deleteSpotfixes() {
+        SQLiteDatabase db = getWritableDatabase();
+        assert db != null;
+        db.execSQL("DELETE FROM " + TABLE_SPOTFIX);
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 

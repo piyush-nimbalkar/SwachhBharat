@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.sbm.model.Spotfix;
 import com.sbm.model.SpotfixBuilder;
+import com.sbm.repository.SpotfixRepository;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -27,7 +28,6 @@ public class SyncSpotfixesTask extends AsyncTask<String, Integer, ServerResponse
     private final static String TAG = "SYNC_TASK";
 
     private final Context context;
-    public DataReceiver delegate;
     private ProgressDialog dialog;
 
     public SyncSpotfixesTask(Context context) {
@@ -92,11 +92,8 @@ public class SyncSpotfixesTask extends AsyncTask<String, Integer, ServerResponse
             e.printStackTrace();
         }
 
-        try {
-            delegate.receive(response);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        SpotfixRepository repository = new SpotfixRepository(context);
+        repository.createSpotfixes(spotfixes);
 
         if (dialog.isShowing())
             dialog.dismiss();
