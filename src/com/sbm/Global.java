@@ -20,7 +20,7 @@ public final class Global {
     public static final String SPOTFIX_DESC = "description";
     public static final String SPOTFIX_STATUS = "status";
     public static final String SPOTFIX_ESTIMATED_HOURS = "estimated_hours";
-    public static final String SPOTFIX_ESTIMATED_PEOPLE = "extimated_people";
+    public static final String SPOTFIX_ESTIMATED_PEOPLE = "estimated_people";
     public static final String SPOTFIX_OWNER_ID = "owner_id";
     public static final String SPOTFIX_LAT = "latitude";
     public static final String SPOTFIX_LONG = "longitude";

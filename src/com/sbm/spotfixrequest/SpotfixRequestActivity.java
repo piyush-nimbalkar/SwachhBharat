@@ -1,5 +1,6 @@
 package com.sbm.spotfixrequest;
 
+import static com.sbm.Global.HTTP_CREATED;
 import static com.sbm.Global.HTTP_SUCCESS;
 import java.io.BufferedReader;
 import java.io.File;
@@ -125,38 +126,42 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 		});
 		
 		mSpotfixRequestSubmitButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				submitRequest();
-			}
-		});
+
+            @Override
+            public void onClick(View v) {
+                submitRequest();
+            }
+        });
 	}
 
 	private String[] submitRequest() {
-		Date dNow = new Date();
-		SimpleDateFormat fmt = new SimpleDateFormat ("yyyyMMdd_HHmmss", Locale.US);
-		
-		String[] params = new String[8];
+        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT);
+        Date dSelected = new Date();
+        try {
+            dSelected = sdf.parse(mSpotfixFixingDateSelecteTextView.getText().toString());
+        } catch (ParseException aParseException) {
+            // TODO Auto-generated catch block
+            aParseException.printStackTrace();
+        }
 
-		try {
-			spotfixToStore = SpotfixBuilder.spotfix()
-			        .setOwnerId(userID)
-			        .setTitle(mSpotfixTitleEditText.getText().toString())
-			        .setDescription(mSpotfixDescEditText.getText().toString())
-			        .setEstimatedHours(Long.parseLong(mSpotfixEstimatedHoursEditText.getText().toString()))
-			        .setEstimatedPeople(Long.parseLong(mSpotfixEstimatedPeopleEditText.getText().toString()))
-			        //Ebiquity Lab LAT LONG approx
-			        .setLatitude(39.253701)
-			        .setLongitude(-76.714585)
-			        .setFixDate(fmt.format(dNow)).build();
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String[] params = new String[9];
+
+//		try {
+//			spotfixToStore = SpotfixBuilder.spotfix()
+//			        .setOwnerId(userID)
+//			        .setTitle(mSpotfixTitleEditText.getText().toString())
+//			        .setDescription(mSpotfixDescEditText.getText().toString())
+//			        .setEstimatedHours(Long.parseLong(mSpotfixEstimatedHoursEditText.getText().toString()))
+//			        .setEstimatedPeople(Long.parseLong(mSpotfixEstimatedPeopleEditText.getText().toString()))
+//                    .setStatus("pending")
+//			        //Ebiquity Lab LAT LONG approx
+//			        .setLatitude(39.253701)
+//			        .setLongitude(-76.714585)
+//			        .setFixDate(dSelected).build();
+//		} catch (NumberFormatException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 //		spotfixToStore.valid();
 		
 		params[0] = String.valueOf(userID);
@@ -167,7 +172,12 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         //Ebiquity Lab LAT LONG approx
 		params[5] = "39.253701";
 		params[6] = "-76.714585";
-		params[7] = fmt.format(dNow);
+		params[7] = dSelected.toString();
+        params[8] = "pending";
+
+        for(String param : params) {
+            Log.v(TAG, param);
+        }
 
 		SpotfixRequestSubmit spotfixRequestSubmit = new SpotfixRequestSubmit(context);
 		spotfixRequestSubmit.delegate = (DataReceiver) context;
@@ -180,7 +190,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     @Override
     public void receive(ServerResponse response) throws JSONException {
         if (response != null) {
-            if (response.getStatusCode() == HTTP_SUCCESS) {
+            if (response.getStatusCode() == HTTP_CREATED) {
                 Toast.makeText(context, "Successfully submitted the request", Toast.LENGTH_LONG).show();
                 finish();
             } else {
@@ -202,7 +212,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            this.dialog.setMessage("Signing in..");
+            this.dialog.setMessage("Submitting request...");
             this.dialog.show();
         }
 
@@ -214,7 +224,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             HttpPost post = new HttpPost(Global.CREATE_SPOTFIXES_URL);
 
             List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair(Global.USER_ID, params[0]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_OWNER_ID, params[0]));
             value.add(new BasicNameValuePair(Global.SPOTFIX_TITLE, params[1]));
             value.add(new BasicNameValuePair(Global.SPOTFIX_DESC, params[2]));
             value.add(new BasicNameValuePair(Global.SPOTFIX_ESTIMATED_HOURS, params[3]));
@@ -222,9 +232,11 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             value.add(new BasicNameValuePair(Global.SPOTFIX_LAT, params[5]));
             value.add(new BasicNameValuePair(Global.SPOTFIX_LONG, params[6]));
             value.add(new BasicNameValuePair(Global.SPOTFIX_FIX_DATE, params[7]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_STATUS, params[8]));
 
             try {
                 post.setEntity(new UrlEncodedFormEntity(value));
+//                post.setHeader("Content-type: application/JSON", "");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -232,7 +244,14 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             try {
                 HttpResponse httpResponse = client.execute(post);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-                String responseString = reader.readLine();
+                String responseString = "";
+                String temp;
+                while((temp = reader.readLine()) != null)
+                    responseString += temp;
+
+//                Log.d("----------", String.valueOf(post.getParams()));
+                Log.d("----------", responseString);
+//                Log.d("----------", String.valueOf(httpResponse.getStatusLine().getStatusCode()));
                 serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
             } catch (Exception e) {
                 e.printStackTrace();
