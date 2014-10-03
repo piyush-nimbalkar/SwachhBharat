@@ -1,19 +1,22 @@
 package com.sbm;
 
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sbm.model.Spotfix;
@@ -28,11 +31,16 @@ public class MainActivity extends Activity implements DataReceiver {
 
     private static String TAG = "MAIN_ACTIVITY";
 
+    private final static int DEFAULT_ZOOM_LEVEL = 14;
+
     private Context context;
     private SharedPreferences preferences;
 
     private GoogleMap map;
-    private LocationTracker locationTracker;
+
+    private Handler locationUpdateHandler = new Handler();
+    private NetworkLocationListener listener;
+    private LocationManager locationManager;
 
     private ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
 
@@ -48,22 +56,18 @@ public class MainActivity extends Activity implements DataReceiver {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        locationTracker = new LocationTracker(context);
+        listener = new NetworkLocationListener();
+        locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, listener);
 
         MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.spotfixes_map));
         assert mapFragment != null;
         map = mapFragment.getMap();
         map.getUiSettings().setZoomControlsEnabled(false);
 
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(39.255, -76.710), 15));
-
         SyncSpotfixesTask task = new SyncSpotfixesTask(context);
         task.delegate = (DataReceiver) context;
         task.execute();
-
-        Log.d(TAG, Long.valueOf(preferences.getLong(CURRENT_USER_ID, 0)).toString());
-        Log.d(TAG, preferences.getString(CURRENT_USER_EMAIL, ""));
     }
 
     @Override
@@ -94,8 +98,7 @@ public class MainActivity extends Activity implements DataReceiver {
     @Override
     protected void onPause() {
         super.onPause();
-        if (locationTracker != null)
-            locationTracker.removeLocationUpdates();
+        locationManager.removeUpdates(listener);
     }
 
     @Override
@@ -107,6 +110,45 @@ public class MainActivity extends Activity implements DataReceiver {
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
                     .title(String.valueOf(spotfix.getTitle())));
+    }
+
+
+    class NetworkLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            NetworkLocationRefresher task = new NetworkLocationRefresher(location);
+            locationUpdateHandler.post(task);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+
+    }
+
+    class NetworkLocationRefresher implements Runnable {
+
+        Location location;
+
+        public NetworkLocationRefresher(Location location) {
+            this.location = location;
+        }
+
+        @Override
+        public void run() {
+            map.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
+        }
+
     }
 
 }
