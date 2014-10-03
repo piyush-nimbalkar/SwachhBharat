@@ -1,8 +1,10 @@
 package com.sbm;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -11,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,6 +35,8 @@ public class MainActivity extends Activity implements DataReceiver {
     private static String TAG = "MAIN_ACTIVITY";
 
     private final static int DEFAULT_ZOOM_LEVEL = 14;
+    private final static int GPS_UPDATE_INTERVAL = 60 * 1000;
+    private final static int NETWORK_UPDATE_INTERVAL = 30 * 1000;
 
     private Context context;
     private SharedPreferences preferences;
@@ -39,7 +44,8 @@ public class MainActivity extends Activity implements DataReceiver {
     private GoogleMap map;
 
     private Handler locationUpdateHandler = new Handler();
-    private NetworkLocationListener listener;
+    private NetworkLocationListener networkListener;
+    private GpsLocationListener gpsListener;
     private LocationManager locationManager;
 
     private ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
@@ -56,9 +62,9 @@ public class MainActivity extends Activity implements DataReceiver {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        listener = new NetworkLocationListener();
+        networkListener = new NetworkLocationListener();
+        gpsListener = new GpsLocationListener();
         locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, listener);
 
         MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.spotfixes_map));
         assert mapFragment != null;
@@ -68,6 +74,64 @@ public class MainActivity extends Activity implements DataReceiver {
         SyncSpotfixesTask task = new SyncSpotfixesTask(context);
         task.delegate = (DataReceiver) context;
         task.execute();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_INTERVAL, 0, networkListener);
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GPS_UPDATE_INTERVAL, 0, gpsListener);
+        else
+            updateBestKnownLocation();
+    }
+
+    private void updateBestKnownLocation() {
+        showEnableGpsDialog();
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (gpsLocation != null && networkLocation != null) {
+                if (gpsLocation.getTime() > networkLocation.getTime())
+                    updateLocationOnGpsDisabled(gpsLocation);
+                else
+                    updateLocationOnGpsDisabled(networkLocation);
+            } else if (gpsLocation != null) {
+                updateLocationOnGpsDisabled(gpsLocation);
+            } else if (networkLocation != null) {
+                updateLocationOnGpsDisabled(networkLocation);
+            }
+        }
+    }
+
+    private void showEnableGpsDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle(R.string.gps_dialog_title);
+        alertDialog.setMessage(R.string.gps_dialog_message);
+
+        alertDialog.setPositiveButton(R.string.settings_button, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void updateLocationOnGpsDisabled(Location location) {
+        map.animateCamera(CameraUpdateFactory
+                .newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM_LEVEL));
     }
 
     @Override
@@ -98,7 +162,8 @@ public class MainActivity extends Activity implements DataReceiver {
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(listener);
+        locationManager.removeUpdates(gpsListener);
+        locationManager.removeUpdates(networkListener);
     }
 
     @Override
@@ -110,14 +175,15 @@ public class MainActivity extends Activity implements DataReceiver {
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
                     .title(String.valueOf(spotfix.getTitle())));
-    }
 
+
+    }
 
     class NetworkLocationListener implements LocationListener {
 
         @Override
         public void onLocationChanged(Location location) {
-            NetworkLocationRefresher task = new NetworkLocationRefresher(location);
+            LocationRefresher task = new LocationRefresher(location);
             locationUpdateHandler.post(task);
         }
 
@@ -135,11 +201,33 @@ public class MainActivity extends Activity implements DataReceiver {
 
     }
 
-    class NetworkLocationRefresher implements Runnable {
+    class GpsLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            LocationRefresher task = new LocationRefresher(location);
+            locationUpdateHandler.post(task);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+
+    }
+
+    class LocationRefresher implements Runnable {
 
         Location location;
 
-        public NetworkLocationRefresher(Location location) {
+        public LocationRefresher(Location location) {
             this.location = location;
         }
 
