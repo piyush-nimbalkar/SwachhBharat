@@ -1,22 +1,46 @@
 package com.sbm.spotfixrequest;
 
+import static com.sbm.Global.HTTP_SUCCESS;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import com.sbm.DataReceiver;
+import com.sbm.Global;
 import com.sbm.R;
+import com.sbm.ServerResponse;
+import com.sbm.model.Spotfix;
+import com.sbm.model.SpotfixBuilder;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -26,8 +50,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class SpotfixRequestActivity extends Activity implements DatePickerFragment.TheListener {
+public class SpotfixRequestActivity extends Activity implements DatePickerFragment.TheListener, DataReceiver {
 	private static final String TAG = "SPOTFIX_REQUEST_ACTIVITY";
 	private static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -49,10 +74,19 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
 	private File imageTaken;
 
+	private Spotfix spotfixToStore;
+	private Context context;
+    private SharedPreferences preferences;
+    private long userID;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_spotfix_request);
+		
+        context = this;
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        userID = preferences.getLong(Global.CURRENT_USER_ID, -1);
 		
 		mSpotfixTitleEditText = (EditText) findViewById(R.id.editTextSpotfixTitle); 
 		mSpotfixDescEditText = (EditText) findViewById(R.id.editTextSpotfixDesc); 
@@ -94,30 +128,138 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 			
 			@Override
 			public void onClick(View v) {
-				verifyInput();
 				submitRequest();
 			}
 		});
 	}
 
-	private void submitRequest() {
-		// TODO Auto-generated method stub
+	private String[] submitRequest() {
+		Date dNow = new Date();
+		SimpleDateFormat fmt = new SimpleDateFormat ("yyyyMMdd_HHmmss", Locale.US);
 		
+		String[] params = new String[8];
+
+		try {
+			spotfixToStore = SpotfixBuilder.spotfix()
+			        .setOwnerId(userID)
+			        .setTitle(mSpotfixTitleEditText.getText().toString())
+			        .setDescription(mSpotfixDescEditText.getText().toString())
+			        .setEstimatedHours(Long.parseLong(mSpotfixEstimatedHoursEditText.getText().toString()))
+			        .setEstimatedPeople(Long.parseLong(mSpotfixEstimatedPeopleEditText.getText().toString()))
+			        //Ebiquity Lab LAT LONG approx
+			        .setLatitude(39.253701)
+			        .setLongitude(-76.714585)
+			        .setFixDate(fmt.format(dNow)).build();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		spotfixToStore.valid();
+		
+		params[0] = String.valueOf(userID);
+		params[1] = mSpotfixTitleEditText.getText().toString();
+		params[2] = mSpotfixDescEditText.getText().toString();
+		params[3] = mSpotfixEstimatedHoursEditText.getText().toString();
+		params[4] = mSpotfixEstimatedPeopleEditText.getText().toString();
+        //Ebiquity Lab LAT LONG approx
+		params[5] = "39.253701";
+		params[6] = "-76.714585";
+		params[7] = fmt.format(dNow);
+
+		SpotfixRequestSubmit spotfixRequestSubmit = new SpotfixRequestSubmit(context);
+		spotfixRequestSubmit.delegate = (DataReceiver) context;
+		spotfixRequestSubmit.execute(params);
+
+        String[] dummy = new String[1];
+		return dummy;
 	}
 
-	private boolean verifyInput() {
-		if(mSpotfixTitleEditText.getText().length()==0)
-			return false;
-		if(mSpotfixDescEditText.getText().length()==0)
-			return false;
-		if(mSpotfixEstimatedHoursEditText.getText().length()==0)
-			return false;
-		if(mSpotfixEstimatedPeopleEditText.getText().length()==0)
-			return false;
-		return true;
-	}
+    @Override
+    public void receive(ServerResponse response) throws JSONException {
+        if (response != null) {
+            if (response.getStatusCode() == HTTP_SUCCESS) {
+                Toast.makeText(context, "Successfully submitted the request", Toast.LENGTH_LONG).show();
+                finish();
+            } else {
+                Toast.makeText(context, "Submission failure: "+response.getMessage()+" please enter all the required values", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    private static class SpotfixRequestSubmit extends AsyncTask<String, Integer, ServerResponse> {
+        private final Context spotfixRequestSubmitContext;
+        private ProgressDialog dialog;
+        public DataReceiver delegate;
 
-	/**
+        public SpotfixRequestSubmit(Context context) {
+        	spotfixRequestSubmitContext = context;
+            dialog = new ProgressDialog(spotfixRequestSubmitContext);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            this.dialog.setMessage("Signing in..");
+            this.dialog.show();
+        }
+
+        @Override
+        protected ServerResponse doInBackground(String... params) {
+            ServerResponse serverResponse = null;
+
+            HttpClient client = new DefaultHttpClient();
+            HttpPost post = new HttpPost(Global.SPOTFIX_SUBMIT_URL);
+
+            List<NameValuePair> value = new LinkedList<NameValuePair>();
+            value.add(new BasicNameValuePair(Global.USER_ID, params[0]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_TITLE, params[1]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_DESC, params[2]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_ESTIMATED_HOURS, params[3]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_ESTIMATED_PEOPLE, params[4]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_LAT, params[5]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_LONG, params[6]));
+            value.add(new BasicNameValuePair(Global.SPOTFIX_FIX_DATE, params[7]));
+
+            try {
+                post.setEntity(new UrlEncodedFormEntity(value));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
+                HttpResponse httpResponse = client.execute(post);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+                String responseString = reader.readLine();
+                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return serverResponse;
+        }
+
+        @Override
+        protected void onPostExecute(ServerResponse response) {
+            super.onPostExecute(response);
+            try {
+                delegate.receive(response);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (dialog.isShowing())
+                dialog.dismiss();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+
+    }
+
+    /**
 	 * This method creates the file where the image will be stored
 	 * @return Returns the file object for storing the image
 	 * @throws IOException
@@ -273,143 +415,6 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 		return f;
 	}
 	
-/**
-    public int uploadFile(String sourceFileUri) {
-        HttpURLConnection conn = null;
-        DataOutputStream dos = null;  
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary = "*****";
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1 * 1024 * 1024; 
-        File sourceFile = new File(sourceFileUri); 
-         
-        if (!sourceFile.isFile()) {
-             
-             dialog.dismiss(); 
-              
-             Log.e("uploadFile", "Source File not exist :"
-                                 +uploadFilePath + "" + uploadFileName);
-              
-             runOnUiThread(new Runnable() {
-                 public void run() {
-                	 Toast.makeText(TakePictureActivity.this, "Source File not exist :"
-                             +uploadFilePath + "" + uploadFileName, Toast.LENGTH_SHORT).show();
-                 }
-             }); 
-              
-             return 0;
-          
-        }
-        else
-        {
-             try { 
-                  
-                   // open a URL connection to the Servlet
-                 FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                 URL url = new URL(upLoadServerUri);
-                  
-                 // Open a HTTP  connection to  the URL
-                 conn = (HttpURLConnection) url.openConnection(); 
-                 conn.setDoInput(true); // Allow Inputs
-                 conn.setDoOutput(true); // Allow Outputs
-                 conn.setUseCaches(false); // Don't use a Cached Copy
-                 conn.setRequestMethod("POST");
-                 conn.setRequestProperty("Connection", "Keep-Alive");
-                 conn.setRequestProperty("Connection", "close"); 
-                 conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                 conn.setRequestProperty("uploaded_file", fileName); 
-                  
-                 dos = new DataOutputStream(conn.getOutputStream());
-        
-                 dos.writeBytes(twoHyphens + boundary + lineEnd); 
-                 dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\"" + fileName + "\"" + lineEnd);
-                  
-                 dos.writeBytes(lineEnd);
-        
-                 // create a buffer of  maximum size
-                 bytesAvailable = fileInputStream.available(); 
-        
-                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                 buffer = new byte[bufferSize];
-        
-                 // read file and write it into form...
-                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);  
-                    
-                 while (bytesRead > 0) {
-                      
-                   dos.write(buffer, 0, bufferSize);
-                   bytesAvailable = fileInputStream.available();
-                   bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                   bytesRead = fileInputStream.read(buffer, 0, bufferSize);   
-                    
-                  }
-        
-                 // send multipart form data necesssary after file data...
-                 dos.writeBytes(lineEnd);
-                 dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-        
-                 // Responses from the server (code and message)
-                 serverResponseCode = conn.getResponseCode();
-                 String serverResponseMessage = conn.getResponseMessage();
-                   
-                 Log.i("uploadFile", "HTTP Response is : "
-                         + serverResponseMessage + ": " + serverResponseCode);
-                  
-                 if(serverResponseCode == 200){
-                      
-                     runOnUiThread(new Runnable() {
-                          public void run() {
-                               
-                              String msg = "File Upload Completed.\n\n See uploaded file here : \n\n";
-                             fileNameOnServer = "http://www.csee.umbc.edu/~prajit1/Cyclops/uploads/"+uploadFileName;  
-                         	 Toast.makeText(TakePictureActivity.this, msg+fileNameOnServer, 
-                                           Toast.LENGTH_SHORT).show();
-                          }
-                      });                
-                 }    
-                  
-                 //close the streams //
-                 fileInputStream.close();
-                 dos.flush();
-                 dos.close();
-                   
-            } catch (MalformedURLException ex) {
-                 
-                dialog.dismiss();  
-                ex.printStackTrace();
-                 
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                    	Toast.makeText(TakePictureActivity.this, "MalformedURLException", 
-                                                            Toast.LENGTH_SHORT).show();
-                    }
-                });
-                 
-                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);  
-            } catch (Exception e) {
-                 
-                dialog.dismiss();  
-                e.printStackTrace();
-                 
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                    	Toast.makeText(TakePictureActivity.this, "Got Exception : see logcat ", 
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Log.e("Upload file to server Exception", "Exception : "
-                                                 + e.getMessage(), e);  
-            }
-            dialog.dismiss();       
-            return serverResponseCode; 
-             
-         } // End else block 
-    } 
- */
-
     public static String getTag() {
 		return TAG;
 	}
@@ -421,8 +426,8 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         return true;
     }
 
-    @Override
-    public void returnDate(String date) {
-    	mSpotfixFixingDateSelecteTextView.setText(date);
-    }
+	@Override
+	public void returnDate(String date) {
+		mSpotfixFixingDateSelecteTextView.setText(date);		
+	}
 }
