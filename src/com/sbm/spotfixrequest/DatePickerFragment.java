@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.widget.DatePicker;
+
 import com.sbm.model.Spotfix;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -36,7 +37,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 		Calendar c = Calendar.getInstance();
 		c.set(year, month, day);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT, Locale.US);
         String formattedDate = sdf.format(c.getTime());
 		if (listener != null) {
 			listener.returnDate(formattedDate); 

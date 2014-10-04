@@ -1,8 +1,6 @@
 package com.sbm.spotfixrequest;
 
 import static com.sbm.Global.HTTP_CREATED;
-import static com.sbm.Global.HTTP_SUCCESS;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +25,6 @@ import com.sbm.Global;
 import com.sbm.R;
 import com.sbm.ServerResponse;
 import com.sbm.model.Spotfix;
-import com.sbm.model.SpotfixBuilder;
-
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
@@ -76,7 +72,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
     private File imageTaken;
 
-    private Spotfix spotfixToStore;
+//    private Spotfix spotfixToStore;
     private Context context;
     private SharedPreferences preferences;
     private long userID;
@@ -126,7 +122,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     }
 
     private void submitRequest() {
-        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT, Locale.US);
         Date dSelected = new Date();
         try {
             dSelected = sdf.parse(mSpotfixFixingDateSelecteTextView.getText().toString());

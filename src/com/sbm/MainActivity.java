@@ -1,5 +1,10 @@
 package com.sbm;
 
+import static com.sbm.Global.CURRENT_USER_EMAIL;
+import static com.sbm.Global.CURRENT_USER_ID;
+
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Service;
@@ -14,7 +19,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -27,13 +31,9 @@ import com.sbm.model.Spotfix;
 import com.sbm.repository.SpotfixRepository;
 import com.sbm.spotfixrequest.SpotfixRequestActivity;
 
-import java.util.ArrayList;
-
-import static com.sbm.Global.*;
-
 public class MainActivity extends Activity implements DataReceiver {
 
-    private static String TAG = "MAIN_ACTIVITY";
+//    private static String TAG = "MAIN_ACTIVITY";
 
     private final static int DEFAULT_ZOOM_LEVEL = 14;
     private final static int GPS_UPDATE_INTERVAL = 60 * 1000;

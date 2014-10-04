@@ -14,8 +14,8 @@ public class SpotfixRepository {
     private final Context context;
     private static DataStorage dataStorage;
 
-    public SpotfixRepository(Context context) {
-        this.context = context;
+    public SpotfixRepository(Context aContext) {
+        this.context = aContext;
         dataStorage = new DataStorage(context);
     }
 
