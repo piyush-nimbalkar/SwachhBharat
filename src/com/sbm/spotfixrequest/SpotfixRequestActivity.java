@@ -16,7 +16,6 @@ import com.sbm.ServerResponse;
 import com.sbm.model.Spotfix;
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -52,10 +51,8 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     private EditText mSpotfixEstimatedPeopleEditText;
 
     private TextView mSpotfixFixingDateSelecteTextView;
-
+    private Button mSpotfixRequestSubmitButton;
     private Button mSpotfixFixingTimeSelectButton;
-
-    private File imageTaken;
 
 //    private Spotfix spotfixToStore;
     private Context context;
@@ -84,14 +81,12 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         mSpotfixFixingTimeSelectButton.setOnClickListener(this);
         mSpotfixFixingTimeSelectButton.setEnabled(false);
 
-        Button mSpotfixFixingDateSelectedButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
-        mSpotfixFixingDateSelectedButton.setOnClickListener(this);
-
         Button mSpotfixTakePictureButton = (Button) findViewById(R.id.buttonSpotfixTakePicture);
         mSpotfixTakePictureButton.setOnClickListener(this);
 
-        Button mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
+        mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
         mSpotfixRequestSubmitButton.setOnClickListener(this);
+        mSpotfixRequestSubmitButton.setEnabled(false);
 
         mImageView = (ImageView) findViewById(R.id.imageViewDisplayTakenPicture);
         mImageView.setVisibility(View.GONE);
@@ -112,7 +107,9 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
                 timePickerFragment.show(getFragmentManager(), "timePickerFragment");
                 break;
             case R.id.buttonSpotfixTakePicture:
+                //Step 1 for taking a photo
                 dispatchTakePictureIntent(REQUEST_TAKE_PHOTO);
+                mSpotfixRequestSubmitButton.setEnabled(true);
                 break;
             case R.id.buttonSpotfixSubmitRequest:
                 submitRequest();
@@ -163,22 +160,27 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         }
     }
 
-    /**
-     * This method creates the file where the image will be stored
-     *
-     * @return Returns the file object for storing the image
-     * @throws IOException
-     */
-    private File createImageFile() throws IOException {
-        Date dNow = new Date();
-        File albumDir = getAlbumDir();
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
-        return File.createTempFile(fmt.format(dNow), ".jpg", albumDir);
-    }
+//    /**
+//     * Takes the image file and displays to the user for accepting
+//     *
+//     * @param image
+//     */
+//    public void displayImage(File image) {
+//        Uri path = Uri.fromFile(image);
+//        Intent jpgOpenintent = new Intent(Intent.ACTION_VIEW);
+//        jpgOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        jpgOpenintent.setDataAndType(path, "image/jpg");
+//        try {
+//            startActivity(jpgOpenintent);
+//        } catch (ActivityNotFoundException e) {
+//            //TODO
+//        }
+//    }
 
     /**
      * Takes an actionCode to determine the choice in the activity results.
      * Method to send the intent to capture image
+     * Step 1 to take photo
      *
      * @param actionCode Defines what action to be taken
      */
@@ -194,39 +196,39 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             e.printStackTrace();
             mCurrentPhotoPath = null;
         }
-        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+        //Step 6 will start here
+        startActivityForResult(takePictureIntent, actionCode);
     }
 
     /**
-     * Takes the image file and displays to the user for accepting
+     * Step 2 in taking photo
+     * @return returns the image file
+     * @throws IOException
+     */
+    private File setUpPhotoFile() throws IOException {
+//        File imageFile = createImageFile();
+//        mCurrentPhotoPath = imageFile.getAbsolutePath();
+//        return imageFile;
+        return createImageFile();
+    }
+
+    /**
+     * This method creates the file for storing the image in the album path
+     * Step 3 of taking photo
      *
-     * @param image
+     * @return Returns the file object for storing the image
+     * @throws IOException
      */
-    public void displayImage(File image) {
-        Uri path = Uri.fromFile(image);
-        Intent jpgOpenintent = new Intent(Intent.ACTION_VIEW);
-        jpgOpenintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        jpgOpenintent.setDataAndType(path, "image/jpg");
-        try {
-            startActivity(jpgOpenintent);
-        } catch (ActivityNotFoundException e) {
-            //TODO
-        }
+    private File createImageFile() throws IOException {
+        Date dNow = new Date();
+        File albumDir = getAlbumDir();
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+        return File.createTempFile(fmt.format(dNow), ".jpg", albumDir);
     }
 
     /**
-     * Method to add image that was taken using the camera intent into the gallery
-     */
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
-        imageTaken = new File(mCurrentPhotoPath);
-        Uri contentUri = Uri.fromFile(imageTaken);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
-
-    /**
-     * Gets the album location and creates the folder if necessary
+     * Gets the album location and creating the folder if necessary
+     * Step 4 of taking photo
      *
      * @return Returns reference to directory where the image will be stored
      */
@@ -237,7 +239,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             if (storageDir != null) {
                 if (!storageDir.mkdirs()) {
                     if (!storageDir.exists()) {
-                        Log.d("CameraSample", "failed to create directory");
+                        Log.d(TAG, "failed to create directory");
                         return null;
                     }
                 }
@@ -249,7 +251,9 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     }
 
     /**
-     * Returns Photo album for this application
+     * Getting the album name for this application
+     * Step 5 of taking photo
+     * Last step to be pushed on to the stack and now we go on popping
      *
      * @return Returns the name of the album for the application
      */
@@ -258,17 +262,11 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     }
 
     /**
-     * Method that adds the image into the gallery
+     * Step 6 for taking picture this step is where the activity result is used to store the image data through the handleCameraPhoto
+     * @param requestCode code defining that the request is to take a picture
+     * @param resultCode the result code defines if the activity was successful or not
+     * @param data the image data is received in this variable
      */
-    private void handleCameraPhoto() {
-        if (mCurrentPhotoPath != null) {
-            setPic();
-            galleryAddPic();
-            //Image was taken, time to send it now
-            mCurrentPhotoPath = null;
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO)
@@ -277,7 +275,32 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     }
 
     /**
-     * Sets the image properties for the picture being taken
+     * Step 7 of taking picture and adding to gallery
+     * image is handled here
+     */
+    private void handleCameraPhoto() {
+        if (mCurrentPhotoPath != null) {
+            galleryAddPic();
+            setPic();
+            //Image was taken, time to send it now
+            mCurrentPhotoPath = null;
+        }
+    }
+
+    /**
+     * Step 8 Adding to gallery
+     * Method to add image that was taken using the camera intent into the gallery
+     */
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+        Uri contentUri = Uri.fromFile(new File(mCurrentPhotoPath));
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+    /**
+     * Step 9 of taking picture
+     * Sets the image properties for the picture being taken and show it in the imageview
      */
     private void setPic() {
         /* There isn't enough memory to open up more than a couple camera photos */
@@ -311,12 +334,6 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 		/* Associate the Bitmap to the ImageView */
         mImageView.setImageBitmap(bitmap);
         mImageView.setVisibility(View.VISIBLE);
-    }
-
-    private File setUpPhotoFile() throws IOException {
-        File imageFile = createImageFile();
-        mCurrentPhotoPath = imageFile.getAbsolutePath();
-        return imageFile;
     }
 
     @Override
