@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -52,28 +53,28 @@ public class MainActivity extends Activity implements DataReceiver {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = this;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (preferences.getLong(CURRENT_USER_ID, 0) == 0) {
             startActivity(new Intent(context, LoginActivity.class));
             finish();
+        } else {
+            setContentView(R.layout.main);
+
+            networkListener = new NetworkLocationListener();
+            gpsListener = new GpsLocationListener();
+            locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
+
+            MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.spotfixes_map));
+            assert mapFragment != null;
+            map = mapFragment.getMap();
+            map.getUiSettings().setZoomControlsEnabled(false);
+
+            SyncSpotfixesTask task = new SyncSpotfixesTask(context);
+            task.delegate = (DataReceiver) context;
+            task.execute();
         }
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
-        networkListener = new NetworkLocationListener();
-        gpsListener = new GpsLocationListener();
-        locationManager = (LocationManager) getSystemService(Service.LOCATION_SERVICE);
-
-        MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.spotfixes_map));
-        assert mapFragment != null;
-        map = mapFragment.getMap();
-        map.getUiSettings().setZoomControlsEnabled(false);
-
-        SyncSpotfixesTask task = new SyncSpotfixesTask(context);
-        task.delegate = (DataReceiver) context;
-        task.execute();
     }
 
     @Override
@@ -175,8 +176,6 @@ public class MainActivity extends Activity implements DataReceiver {
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
                     .title(String.valueOf(spotfix.getTitle())));
-
-
     }
 
     class NetworkLocationListener implements LocationListener {
