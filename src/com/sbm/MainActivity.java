@@ -1,9 +1,7 @@
 package com.sbm;
 
-import static com.sbm.Global.CURRENT_USER_EMAIL;
-import static com.sbm.Global.CURRENT_USER_ID;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,12 +24,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sbm.model.Spotfix;
 import com.sbm.repository.SpotfixRepository;
 import com.sbm.spotfixrequest.SpotfixRequestActivity;
+import com.sbm.spotfixrequest.ViewSpotfixActivity;
 
-public class MainActivity extends Activity implements DataReceiver {
+import static com.sbm.Global.*;
+
+public class MainActivity extends Activity implements DataReceiver, GoogleMap.OnInfoWindowClickListener {
 
 //    private static String TAG = "MAIN_ACTIVITY";
 
@@ -43,6 +45,7 @@ public class MainActivity extends Activity implements DataReceiver {
     private SharedPreferences preferences;
 
     private GoogleMap map;
+    HashMap<String, Long> extraMarkerInfo = new HashMap<String, Long>();
 
     private Handler locationUpdateHandler = new Handler();
     private NetworkLocationListener networkListener;
@@ -74,6 +77,8 @@ public class MainActivity extends Activity implements DataReceiver {
             SyncSpotfixesTask task = new SyncSpotfixesTask(context);
             task.delegate = (DataReceiver) context;
             task.execute();
+
+            map.setOnInfoWindowClickListener(this);
         }
     }
 
@@ -172,10 +177,19 @@ public class MainActivity extends Activity implements DataReceiver {
         SpotfixRepository repository = new SpotfixRepository(context);
         spotfixes = repository.getSpotfixes();
         map.clear();
-        for (Spotfix spotfix : spotfixes)
-            map.addMarker(new MarkerOptions()
+        for (Spotfix spotfix : spotfixes) {
+            Marker marker = map.addMarker(new MarkerOptions()
                     .position(new LatLng(spotfix.getLatitude(), spotfix.getLongitude()))
-                    .title(String.valueOf(spotfix.getTitle())));
+                    .title(spotfix.getTitle()));
+            extraMarkerInfo.put(marker.getId(), spotfix.getId());
+        }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Intent intent = new Intent(context, ViewSpotfixActivity.class);
+        intent.putExtra(SPOTFIX_ID, extraMarkerInfo.get(marker.getId()));
+        startActivity(intent);
     }
 
     class NetworkLocationListener implements LocationListener {
