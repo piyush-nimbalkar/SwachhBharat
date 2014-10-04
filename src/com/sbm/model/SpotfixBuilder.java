@@ -71,11 +71,6 @@ public class SpotfixBuilder {
         return this;
     }
 
-    public SpotfixBuilder setFixDate(Date fixDate) {
-        this.fixDate = fixDate;
-        return this;
-    }
-
     public SpotfixBuilder setFixDate(String fixDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT);
         this.fixDate = sdf.parse(fixDate);

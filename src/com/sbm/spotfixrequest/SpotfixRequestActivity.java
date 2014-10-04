@@ -1,24 +1,13 @@
 package com.sbm.spotfixrequest;
 
 import static com.sbm.Global.HTTP_CREATED;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import com.sbm.DataReceiver;
 import com.sbm.Global;
@@ -27,7 +16,6 @@ import com.sbm.ServerResponse;
 import com.sbm.model.Spotfix;
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +23,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -66,16 +53,12 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
     private TextView mSpotfixFixingDateSelecteTextView;
 
-    private Button mSpotfixFixingDateSelectButton;
     private Button mSpotfixFixingTimeSelectButton;
-    private Button mSpotfixTakePictureButton;
-    private Button mSpotfixRequestSubmitButton;
 
     private File imageTaken;
 
 //    private Spotfix spotfixToStore;
     private Context context;
-    private SharedPreferences preferences;
     private long userID;
     private String spotfixFixingDateAndTime;
 
@@ -85,7 +68,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         setContentView(R.layout.activity_spotfix_request);
 
         context = this;
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         userID = preferences.getLong(Global.CURRENT_USER_ID, -1);
 
         mSpotfixTitleEditText = (EditText) findViewById(R.id.editTextSpotfixTitle);
@@ -94,14 +77,20 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         mSpotfixEstimatedPeopleEditText = (EditText) findViewById(R.id.editTextSpotfixEstimatedPeople);
         mSpotfixFixingDateSelecteTextView = (TextView) findViewById(R.id.textViewSpotfixFixingDateSelected);
 
-        mSpotfixFixingDateSelectButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
+        Button mSpotfixFixingDateSelectButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
         mSpotfixFixingDateSelectButton.setOnClickListener(this);
+
         mSpotfixFixingTimeSelectButton = (Button) findViewById(R.id.buttonSpotfixFixingTime);
         mSpotfixFixingTimeSelectButton.setOnClickListener(this);
         mSpotfixFixingTimeSelectButton.setEnabled(false);
-        mSpotfixTakePictureButton = (Button) findViewById(R.id.buttonSpotfixTakePicture);
+
+        Button mSpotfixFixingDateSelectedButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
+        mSpotfixFixingDateSelectedButton.setOnClickListener(this);
+
+        Button mSpotfixTakePictureButton = (Button) findViewById(R.id.buttonSpotfixTakePicture);
         mSpotfixTakePictureButton.setOnClickListener(this);
-        mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
+
+        Button mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
         mSpotfixRequestSubmitButton.setOnClickListener(this);
 
         mImageView = (ImageView) findViewById(R.id.imageViewDisplayTakenPicture);
@@ -156,7 +145,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
             Log.v(TAG, param);
         }
 
-        SpotfixRequestSubmit spotfixRequestSubmit = new SpotfixRequestSubmit(context);
+        SubmitSpotfixTask spotfixRequestSubmit = new SubmitSpotfixTask(context);
         spotfixRequestSubmit.delegate = (DataReceiver) context;
         spotfixRequestSubmit.execute(params);
     }
@@ -165,83 +154,13 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     public void receive(ServerResponse response) throws JSONException {
         if (response != null) {
             if (response.getStatusCode() == HTTP_CREATED) {
+
                 Toast.makeText(context, "Successfully submitted the request", Toast.LENGTH_LONG).show();
                 finish();
             } else {
                 Toast.makeText(context, "Submission failure: " + response.getMessage() + " please enter all the required values", Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    private static class SpotfixRequestSubmit extends AsyncTask<String, Integer, ServerResponse> {
-        private final Context spotfixRequestSubmitContext;
-        private ProgressDialog dialog;
-        public DataReceiver delegate;
-
-        public SpotfixRequestSubmit(Context context) {
-            spotfixRequestSubmitContext = context;
-            dialog = new ProgressDialog(spotfixRequestSubmitContext);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            this.dialog.setMessage("Submitting request...");
-            this.dialog.show();
-        }
-
-        @Override
-        protected ServerResponse doInBackground(String... params) {
-            ServerResponse serverResponse = null;
-
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(Global.CREATE_SPOTFIXES_URL);
-
-            List<NameValuePair> value = new LinkedList<NameValuePair>();
-            value.add(new BasicNameValuePair(Global.SPOTFIX_OWNER_ID, params[0]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_TITLE, params[1]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_DESC, params[2]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_ESTIMATED_HOURS, params[3]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_ESTIMATED_PEOPLE, params[4]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_LAT, params[5]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_LONG, params[6]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_FIX_DATE, params[7]));
-            value.add(new BasicNameValuePair(Global.SPOTFIX_STATUS, params[8]));
-
-            try {
-                post.setEntity(new UrlEncodedFormEntity(value));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            try {
-                HttpResponse httpResponse = client.execute(post);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-                String responseString = reader.readLine();
-                serverResponse = new ServerResponse(httpResponse.getStatusLine().getStatusCode(), responseString);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return serverResponse;
-        }
-
-        @Override
-        protected void onPostExecute(ServerResponse response) {
-            super.onPostExecute(response);
-            try {
-                delegate.receive(response);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (dialog.isShowing())
-                dialog.dismiss();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
     }
 
     /**
@@ -252,10 +171,9 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
      */
     private File createImageFile() throws IOException {
         Date dNow = new Date();
+        File albumDir = getAlbumDir();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
-        File albumF = getAlbumDir();
-        //Creates a jpeg file
-        return File.createTempFile(fmt.format(dNow), ".jpg", albumF);
+        return File.createTempFile(fmt.format(dNow), ".jpg", albumDir);
     }
 
     /**
@@ -266,18 +184,17 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
      */
     private void dispatchTakePictureIntent(int actionCode) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File f;
+        File file;
 
         try {
-            f = setUpPhotoFile();
-            mCurrentPhotoPath = f.getAbsolutePath();
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+            file = setUpPhotoFile();
+            mCurrentPhotoPath = file.getAbsolutePath();
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
         } catch (IOException e) {
             e.printStackTrace();
-            f = null;
             mCurrentPhotoPath = null;
         }
-        startActivityForResult(takePictureIntent, 1);
+        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
     }
 
     /**
@@ -397,9 +314,9 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     }
 
     private File setUpPhotoFile() throws IOException {
-        File f = createImageFile();
-        mCurrentPhotoPath = f.getAbsolutePath();
-        return f;
+        File imageFile = createImageFile();
+        mCurrentPhotoPath = imageFile.getAbsolutePath();
+        return imageFile;
     }
 
     @Override
