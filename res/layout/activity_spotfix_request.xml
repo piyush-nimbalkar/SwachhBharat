@@ -107,11 +107,21 @@
         android:id="@+id/buttonSpotfixFixingDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
+        android:layout_marginLeft="75dp"
         android:layout_below="@+id/textViewSpotfixFixingDate"
         android:layout_marginTop="11dp"
         android:text="@string/spotfix_fix_date_button_text"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Small" />
+
+    <Button
+        android:id="@+id/buttonSpotfixFixingTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="175dp"
+        android:layout_below="@+id/textViewSpotfixFixingDate"
+        android:layout_marginTop="11dp"
+        android:text="@string/spotfix_fix_time_button_text"
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.Small" />
 

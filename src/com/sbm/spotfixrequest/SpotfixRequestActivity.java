@@ -50,7 +50,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SpotfixRequestActivity extends Activity implements DatePickerFragment.TheListener, DataReceiver, OnClickListener {
+public class SpotfixRequestActivity extends Activity implements DatePickerFragment.TheListener, TimePickerFragment.TheListener, DataReceiver, OnClickListener {
     private static final String TAG = "SPOTFIX_REQUEST_ACTIVITY";
     private static final int REQUEST_TAKE_PHOTO = 1;
 
@@ -66,7 +66,8 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
     private TextView mSpotfixFixingDateSelecteTextView;
 
-    private Button mSpotfixFixingDateSelectedButton;
+    private Button mSpotfixFixingDateSelectButton;
+    private Button mSpotfixFixingTimeSelectButton;
     private Button mSpotfixTakePictureButton;
     private Button mSpotfixRequestSubmitButton;
 
@@ -76,13 +77,14 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     private Context context;
     private SharedPreferences preferences;
     private long userID;
+    private String spotfixFixingDateAndTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spotfix_request);
-        context = this;
 
+        context = this;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         userID = preferences.getLong(Global.CURRENT_USER_ID, -1);
 
@@ -92,8 +94,11 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         mSpotfixEstimatedPeopleEditText = (EditText) findViewById(R.id.editTextSpotfixEstimatedPeople);
         mSpotfixFixingDateSelecteTextView = (TextView) findViewById(R.id.textViewSpotfixFixingDateSelected);
 
-        mSpotfixFixingDateSelectedButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
-        mSpotfixFixingDateSelectedButton.setOnClickListener(this);
+        mSpotfixFixingDateSelectButton = (Button) findViewById(R.id.buttonSpotfixFixingDate);
+        mSpotfixFixingDateSelectButton.setOnClickListener(this);
+        mSpotfixFixingTimeSelectButton = (Button) findViewById(R.id.buttonSpotfixFixingTime);
+        mSpotfixFixingTimeSelectButton.setOnClickListener(this);
+        mSpotfixFixingTimeSelectButton.setEnabled(false);
         mSpotfixTakePictureButton = (Button) findViewById(R.id.buttonSpotfixTakePicture);
         mSpotfixTakePictureButton.setOnClickListener(this);
         mSpotfixRequestSubmitButton = (Button) findViewById(R.id.buttonSpotfixSubmitRequest);
@@ -109,8 +114,13 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonSpotfixFixingDate:
-                DialogFragment picker = new DatePickerFragment();
-                picker.show(getFragmentManager(), "datePicker");
+                DialogFragment datePickerFragment = new DatePickerFragment();
+                datePickerFragment.show(getFragmentManager(), "datePickerFragment");
+                mSpotfixFixingTimeSelectButton.setEnabled(true);
+                break;
+            case R.id.buttonSpotfixFixingTime:
+                DialogFragment timePickerFragment = new TimePickerFragment();
+                timePickerFragment.show(getFragmentManager(), "timePickerFragment");
                 break;
             case R.id.buttonSpotfixTakePicture:
                 dispatchTakePictureIntent(REQUEST_TAKE_PHOTO);
@@ -243,23 +253,20 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
     private File createImageFile() throws IOException {
         Date dNow = new Date();
         SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
-        String timeStamp = fmt.format(dNow);
-        String imageFileName = timeStamp;
         File albumF = getAlbumDir();
         //Creates a jpeg file
-        File imageF = File.createTempFile(imageFileName, ".jpg", albumF);
-        return imageF;
+        return File.createTempFile(fmt.format(dNow), ".jpg", albumF);
     }
 
     /**
      * Takes an actionCode to determine the choice in the activity results.
      * Method to send the intent to capture image
      *
-     * @param actionCode
+     * @param actionCode Defines what action to be taken
      */
     private void dispatchTakePictureIntent(int actionCode) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File f = null;
+        File f;
 
         try {
             f = setUpPhotoFile();
@@ -286,6 +293,7 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         try {
             startActivity(jpgOpenintent);
         } catch (ActivityNotFoundException e) {
+            //TODO
         }
     }
 
@@ -394,10 +402,6 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
         return f;
     }
 
-    public static String getTag() {
-        return TAG;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -407,6 +411,17 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
     @Override
     public void returnDate(String date) {
-        mSpotfixFixingDateSelecteTextView.setText(date);
+        String[] parts = date.split(" ");
+        spotfixFixingDateAndTime = parts[0];
+        mSpotfixFixingDateSelecteTextView.setText(spotfixFixingDateAndTime);
+    }
+
+    @Override
+    public void returnTime(String time) {
+        String date = mSpotfixFixingDateSelecteTextView.getText().toString();
+        String[] dateParts = date.split(" ");
+        String[] timeParts = time.split(" ");
+        spotfixFixingDateAndTime = dateParts[0]+" "+timeParts[1];
+        mSpotfixFixingDateSelecteTextView.setText(spotfixFixingDateAndTime);
     }
 }

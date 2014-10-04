@@ -16,6 +16,7 @@
     <string name="spotfix_fix_date_text">Fixing Date</string>
     <string name="spotfix_fix_date_selected_text">Select by clicking button below</string>
     <string name="spotfix_fix_date_button_text">Select Date</string>
+    <string name="spotfix_fix_time_button_text">Select Time</string>
     <string name="spotfix_take_picture_button_text">Take Picture</string>
 
     <string name="send">Send</string>
