@@ -33,6 +33,15 @@ public class SpotfixRepository {
         dataStorage.deleteSpotfixes();
     }
 
+    public Spotfix getSpotfix(long id) {
+        try {
+            return dataStorage.getSpotfix(id);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public ArrayList<Spotfix> getSpotfixes() {
         ArrayList<Spotfix> spotfixes = new ArrayList<Spotfix>();
         try {

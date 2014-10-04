@@ -85,6 +85,32 @@ public class DataStorage extends SQLiteOpenHelper {
         Log.d(TAG, "Spotfix created.");
     }
 
+    public Spotfix getSpotfix(long id) throws ParseException {
+        SQLiteDatabase db = getReadableDatabase();
+        assert db != null;
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_SPOTFIX + " WHERE " + COLUMN_SPOTFIX_ID + "=" + id, null);
+        Spotfix spotfix = null;
+
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    spotfix = SpotfixBuilder.spotfix()
+                            .setId(c.getLong(c.getColumnIndex(COLUMN_SPOTFIX_ID)))
+                            .setOwnerId(c.getLong(c.getColumnIndex(COLUMN_OWNER_ID)))
+                            .setTitle(c.getString(c.getColumnIndex(COLUMN_TITLE)))
+                            .setDescription(c.getString(c.getColumnIndex(COLUMN_DESCRIPTION)))
+                            .setStatus(c.getString(c.getColumnIndex(COLUMN_STATUS)))
+                            .setEstimatedHours(c.getLong(c.getColumnIndex(COLUMN_ESTIMATED_HOURS)))
+                            .setEstimatedPeople(c.getLong(c.getColumnIndex(COLUMN_ESTIMATED_PEOPLE)))
+                            .setLatitude(c.getDouble(c.getColumnIndex(COLUMN_LATITUDE)))
+                            .setLongitude(c.getDouble(c.getColumnIndex(COLUMN_LONGITUDE)))
+                            .setFixDate(c.getString(c.getColumnIndex(COLUMN_FIX_DATE))).build();
+                } while (c.moveToNext());
+            }
+        }
+        return spotfix;
+    }
+
     public ArrayList<Spotfix> getSpotfixes() throws ParseException {
         SQLiteDatabase db = getReadableDatabase();
         assert db != null;
