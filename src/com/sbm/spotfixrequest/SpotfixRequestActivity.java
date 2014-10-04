@@ -345,8 +345,14 @@ public class SpotfixRequestActivity extends Activity implements DatePickerFragme
 
     @Override
     public void returnDate(String date) {
-        String[] parts = date.split(" ");
-        spotfixFixingDateAndTime = parts[0];
+        String time = mSpotfixFixingDateSelecteTextView.getText().toString();
+        String[] timeParts = time.split(" ");
+        if(!timeParts[1].equals("by")) {
+            String[] dateParts = date.split(" ");
+            spotfixFixingDateAndTime = dateParts[0] + " " + timeParts[1];
+        }
+        else
+            spotfixFixingDateAndTime = date;
         mSpotfixFixingDateSelecteTextView.setText(spotfixFixingDateAndTime);
     }
 

@@ -35,7 +35,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 	@Override
 	public void onDateSet(DatePicker view, int year, int month, int day) {
 		Calendar c = Calendar.getInstance();
-		c.set(year, month, day);
+		c.set(year, month, day, 0, 0, 0);
 
         SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT, Locale.US);
         String formattedDate = sdf.format(c.getTime());
