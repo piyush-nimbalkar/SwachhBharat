@@ -29,18 +29,21 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 		listener = (TheListener) getActivity();
 	
 		// Create a new instance of DatePickerDialog and return it
-		return new DatePickerDialog(getActivity(), this, year, month, day);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
+        DatePicker datePicker = datePickerDialog.getDatePicker();
+        datePicker.setMinDate(c.getTimeInMillis());
+        return datePickerDialog;
 	}
 
 	@Override
 	public void onDateSet(DatePicker view, int year, int month, int day) {
-		Calendar c = Calendar.getInstance();
-		c.set(year, month, day, 0, 0, 0);
+        Calendar c = Calendar.getInstance();
+        c.set(year, month, day, 0, 0, 0);
 
         SimpleDateFormat sdf = new SimpleDateFormat(Spotfix.DATE_FORMAT, Locale.US);
         String formattedDate = sdf.format(c.getTime());
 		if (listener != null) {
-			listener.returnDate(formattedDate); 
+			listener.returnDate(formattedDate);
 		}
 	}
 }
